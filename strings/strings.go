@@ -1,7 +1,7 @@
 package strings
 
 import (
-	"github.com/ralvarezdev/go-logger/status"
+	gologgerstatus "github.com/ralvarezdev/go-logger/status"
 	"strings"
 )
 
@@ -41,7 +41,7 @@ func AddParentheses(name string) string {
 }
 
 // FormatStatus gets the formatted status
-func FormatStatus(status status.Status, separator Separator) string {
+func FormatStatus(status gologgerstatus.Status, separator Separator) string {
 	return AddBrackets(status.String(), separator)
 }
 
