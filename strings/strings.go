@@ -53,10 +53,10 @@ func FormatStringArray(outerSeparator, innerSeparator Separator, stringArray *[]
 		return AddBrackets((*stringArray)[0], outerSeparator)
 	} else {
 		var formattedDetails strings.Builder
-		midSeparator := string(innerSeparator) + string(outerSeparator)
+		midSeparator := string(outerSeparator) + string(innerSeparator)
 
 		// Add formatted details
-		formattedDetails.WriteString(string(innerSeparator))
+		formattedDetails.WriteString(midSeparator)
 		for i, str := range *stringArray {
 			formattedDetails.WriteString(str)
 

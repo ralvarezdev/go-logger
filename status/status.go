@@ -21,22 +21,22 @@ const (
 func (s Status) String() string {
 	switch s {
 	case StatusSuccess:
-		return "Success"
+		return "SUCCESS"
 	case StatusFailed:
-		return "Failed"
+		return "FAILED"
 	case StatusError:
-		return "Error"
+		return "ERROR"
 	case StatusWarning:
-		return "Warning"
+		return "WARNING"
 	case StatusInfo:
-		return "Info"
+		return "INFO"
 	case StatusDebug:
-		return "Debug"
+		return "DEBUG"
 	case StatusTrace:
-		return "Trace"
+		return "TRACE"
 	case StatusNone:
 		return ""
 	default:
-		return "Unknown"
+		return "UNKNOWN"
 	}
 }
