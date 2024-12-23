@@ -17,8 +17,9 @@ type (
 
 	// MultilineSeparator is the separator for the multiline content
 	MultilineSeparator struct {
-		LineSeparator Separator
-		TabSize       int
+		SingleLineSeparator Separator
+		LineSeparator       Separator
+		TabSize             int
 	}
 )
 
@@ -44,10 +45,14 @@ func NewRepeatedContentSeparator(separator Separator) *ContentSeparator {
 }
 
 // NewMultilineSeparator creates a new multiline separator
-func NewMultilineSeparator(lineSeparator Separator, tabSize int) *MultilineSeparator {
+func NewMultilineSeparator(
+	singleLineSeparator, lineSeparator Separator,
+	tabSize int,
+) *MultilineSeparator {
 	return &MultilineSeparator{
-		LineSeparator: lineSeparator,
-		TabSize:       tabSize,
+		SingleLineSeparator: singleLineSeparator,
+		LineSeparator:       lineSeparator,
+		TabSize:             tabSize,
 	}
 }
 
@@ -57,9 +62,15 @@ func (m *MultilineSeparator) TabSeparator() Separator {
 }
 
 // AddCharacters adds some characters to a string
-func AddCharacters(content, leftCharacters, rightCharacters string, contentSeparator *ContentSeparator) string {
+func AddCharacters(
+	content, leftCharacters, rightCharacters string,
+	contentSeparator *ContentSeparator,
+) string {
 	if contentSeparator == nil {
-		return strings.Join([]string{leftCharacters, content, rightCharacters}, "")
+		return strings.Join(
+			[]string{leftCharacters, content, rightCharacters},
+			"",
+		)
 	}
 
 	return strings.Join(
@@ -89,32 +100,35 @@ func AddParentheses(name string, contentSeparator *ContentSeparator) string {
 }
 
 // FormatStatus gets the formatted status
-func FormatStatus(status gologgerstatus.Status, contentSeparator *ContentSeparator) string {
+func FormatStatus(
+	status gologgerstatus.Status,
+	contentSeparator *ContentSeparator,
+) string {
 	return AddBrackets(status.String(), contentSeparator)
 }
 
 // FormatStringArray returns a string with all the strings in the array formatted
-func FormatStringArray(multilineSeparator *MultilineSeparator, stringArray *[]string) string {
+func FormatStringArray(
+	multilineSeparator *MultilineSeparator,
+	stringArray *[]string,
+) string {
 	if stringArray == nil || len(*stringArray) == 0 {
 		return ""
 	}
-
-	// Separators
-	lineSeparator := multilineSeparator.LineSeparator
-	tabSeparator := multilineSeparator.TabSeparator()
-	lineAndTabSeparator := lineSeparator + tabSeparator
 
 	// Check if there is only one element
 	if len(*stringArray) == 1 {
 		return AddBrackets(
 			(*stringArray)[0],
-			NewContentSeparator(
-				lineAndTabSeparator,
-				lineSeparator,
-			),
+			NewRepeatedContentSeparator(multilineSeparator.SingleLineSeparator),
 		)
 	} else {
 		var formattedDetails strings.Builder
+
+		// Separators
+		lineSeparator := multilineSeparator.LineSeparator
+		tabSeparator := multilineSeparator.TabSeparator()
+		lineAndTabSeparator := lineSeparator + tabSeparator
 
 		// Add formatted details
 		formattedDetails.WriteString(string(tabSeparator))
@@ -126,7 +140,10 @@ func FormatStringArray(multilineSeparator *MultilineSeparator, stringArray *[]st
 			}
 		}
 
-		return AddBrackets(formattedDetails.String(), NewRepeatedContentSeparator(lineSeparator))
+		return AddBrackets(
+			formattedDetails.String(),
+			NewRepeatedContentSeparator(lineSeparator),
+		)
 	}
 }
 
@@ -145,7 +162,10 @@ func MapErrorArrayToStringArray(errorArray *[]error) *[]string {
 }
 
 // FormatErrorArray returns a string with all the errors in the array formatted
-func FormatErrorArray(multilineSeparator *MultilineSeparator, errorArray *[]error) string {
+func FormatErrorArray(
+	multilineSeparator *MultilineSeparator,
+	errorArray *[]error,
+) string {
 	mappedErrorArray := MapErrorArrayToStringArray(errorArray)
 	return FormatStringArray(multilineSeparator, mappedErrorArray)
 }
