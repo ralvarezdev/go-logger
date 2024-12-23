@@ -49,11 +49,14 @@ func FormatStatus(status gologgerstatus.Status, separator Separator) string {
 func FormatStringArray(outerSeparator, innerSeparator Separator, stringArray *[]string) string {
 	if stringArray == nil || len(*stringArray) == 0 {
 		return ""
-	} else if len(*stringArray) == 1 {
-		return AddBrackets((*stringArray)[0], outerSeparator)
+	}
+
+	// Check if there is only one element
+	midSeparator := string(outerSeparator) + string(innerSeparator)
+	if len(*stringArray) == 1 {
+		return AddBrackets((*stringArray)[0], outerSeparator+innerSeparator)
 	} else {
 		var formattedDetails strings.Builder
-		midSeparator := string(outerSeparator) + string(innerSeparator)
 
 		// Add formatted details
 		formattedDetails.WriteString(midSeparator)
