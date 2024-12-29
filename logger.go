@@ -58,32 +58,6 @@ type (
 	}
 )
 
-// DefaultLogMessageFormat is the default log message format
-var DefaultLogMessageFormat = LogMessageFormat{
-	StatusSeparator: gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	DetailsSeparator: gologgerstrings.NewMultilineSeparator(
-		gologgerstrings.SpaceSeparator,
-		gologgerstrings.NewLineSeparator,
-		1,
-	),
-}
-
-// DefaultLogErrorFormat is the default log error format
-var DefaultLogErrorFormat = LogErrorFormat{
-	StatusSeparator: gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	ErrorsSeparator: gologgerstrings.NewMultilineSeparator(
-		gologgerstrings.SpaceSeparator,
-		gologgerstrings.NewLineSeparator,
-		1,
-	),
-}
-
-// DefaultLoggerFormat is the default logger format
-var DefaultLoggerFormat = LoggerFormat{
-	NameSeparator:    gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	MessageSeparator: gologgerstrings.SpaceSeparator,
-}
-
 // NewLogMessageFormat creates a new log message format
 func NewLogMessageFormat(
 	statusSeparator *gologgerstrings.ContentSeparator,
@@ -102,6 +76,16 @@ func CopyLogMessageFormat(format *LogMessageFormat) *LogMessageFormat {
 		DetailsSeparator: format.DetailsSeparator,
 	}
 }
+
+// DefaultLogMessageFormat is the default log message format
+var DefaultLogMessageFormat = NewLogMessageFormat(
+	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
+	gologgerstrings.NewMultilineSeparator(
+		gologgerstrings.SpaceSeparator,
+		gologgerstrings.NewLineSeparator,
+		1,
+	),
+)
 
 // NewLogErrorFormat creates a new log error format
 func NewLogErrorFormat(
@@ -122,6 +106,16 @@ func CopyLogErrorFormat(format *LogErrorFormat) *LogErrorFormat {
 	}
 }
 
+// DefaultLogErrorFormat is the default log error format
+var DefaultLogErrorFormat = NewLogErrorFormat(
+	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
+	gologgerstrings.NewMultilineSeparator(
+		gologgerstrings.SpaceSeparator,
+		gologgerstrings.NewLineSeparator,
+		1,
+	),
+)
+
 // NewLoggerFormat creates a new logger format
 func NewLoggerFormat(
 	nameSeparator *gologgerstrings.ContentSeparator,
@@ -141,6 +135,12 @@ func CopyLoggerFormat(format *LoggerFormat) *LoggerFormat {
 	}
 }
 
+// DefaultLoggerFormat is the default logger format
+var DefaultLoggerFormat = NewLoggerFormat(
+	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
+	gologgerstrings.SpaceSeparator,
+)
+
 // NewLogMessage creates a new log message
 func NewLogMessage(
 	title string,
@@ -150,7 +150,7 @@ func NewLogMessage(
 ) *LogMessage {
 	// Check if the format is nil
 	if format == nil {
-		format = &DefaultLogMessageFormat
+		format = DefaultLogMessageFormat
 	}
 
 	return &LogMessage{
@@ -202,7 +202,7 @@ func NewLogError(
 ) *LogError {
 	// Check if the format is nil
 	if format == nil {
-		format = &DefaultLogErrorFormat
+		format = DefaultLogErrorFormat
 	}
 
 	return &LogError{
@@ -247,7 +247,7 @@ func (l *LogError) String() string {
 func NewDefaultLogger(name string, format *LoggerFormat) *DefaultLogger {
 	// Check if the format is nil
 	if format == nil {
-		format = &DefaultLoggerFormat
+		format = DefaultLoggerFormat
 	}
 
 	return &DefaultLogger{

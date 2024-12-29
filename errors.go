@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	NilLoggerError = errors.New("logger is nil")
+	ErrNilLogger = errors.New("logger is nil")
 )
