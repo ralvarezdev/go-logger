@@ -1,10 +1,36 @@
 package go_logger
 
 import (
+	gologgerseparator "github.com/ralvarezdev/go-logger/separator"
 	gologgerstatus "github.com/ralvarezdev/go-logger/status"
 	gologgerstrings "github.com/ralvarezdev/go-logger/strings"
 	"log"
 	"strings"
+)
+
+var (
+	// StatusSeparator is the status separator
+	StatusSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
+
+	// ErrorsSeparator is the errors separator
+	ErrorsSeparator = gologgerseparator.NewMultiline(
+		gologgerseparator.Space,
+		gologgerseparator.NewLine,
+		1,
+	)
+
+	// DetailsSeparator is the details separator
+	DetailsSeparator = gologgerseparator.NewMultiline(
+		gologgerseparator.Space,
+		gologgerseparator.NewLine,
+		1,
+	)
+
+	// NameSeparator is the name separator
+	NameSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
+
+	// MessageSeparator is the message separator
+	MessageSeparator = gologgerseparator.Space
 )
 
 type (
@@ -18,24 +44,12 @@ type (
 		title   string
 		details []string
 		status  gologgerstatus.Status
-		format  *LogMessageFormat
-	}
-
-	LogMessageFormat struct {
-		StatusSeparator  *gologgerstrings.ContentSeparator
-		DetailsSeparator *gologgerstrings.MultilineSeparator
 	}
 
 	// LogError struct
 	LogError struct {
 		title  string
 		errors []error
-		format *LogErrorFormat
-	}
-
-	LogErrorFormat struct {
-		StatusSeparator *gologgerstrings.ContentSeparator
-		ErrorsSeparator *gologgerstrings.MultilineSeparator
 	}
 
 	// Logger is an interface for logging messages
@@ -44,127 +58,30 @@ type (
 		LogError(logError *LogError)
 	}
 
-	// LoggerFormat struct
-	LoggerFormat struct {
-		NameSeparator    *gologgerstrings.ContentSeparator
-		MessageSeparator gologgerstrings.Separator
-	}
-
 	// DefaultLogger is a logger that logs messages
 	DefaultLogger struct {
 		name          string
 		formattedName string
-		format        *LoggerFormat
 	}
-)
-
-// NewLogMessageFormat creates a new log message format
-func NewLogMessageFormat(
-	statusSeparator *gologgerstrings.ContentSeparator,
-	detailsSeparator *gologgerstrings.MultilineSeparator,
-) *LogMessageFormat {
-	return &LogMessageFormat{
-		StatusSeparator:  statusSeparator,
-		DetailsSeparator: detailsSeparator,
-	}
-}
-
-// CopyLogMessageFormat creates a copy of a log message format
-func CopyLogMessageFormat(format *LogMessageFormat) *LogMessageFormat {
-	return &LogMessageFormat{
-		StatusSeparator:  format.StatusSeparator,
-		DetailsSeparator: format.DetailsSeparator,
-	}
-}
-
-// DefaultLogMessageFormat is the default log message format
-var DefaultLogMessageFormat = NewLogMessageFormat(
-	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	gologgerstrings.NewMultilineSeparator(
-		gologgerstrings.SpaceSeparator,
-		gologgerstrings.NewLineSeparator,
-		1,
-	),
-)
-
-// NewLogErrorFormat creates a new log error format
-func NewLogErrorFormat(
-	statusSeparator *gologgerstrings.ContentSeparator,
-	errorsSeparator *gologgerstrings.MultilineSeparator,
-) *LogErrorFormat {
-	return &LogErrorFormat{
-		StatusSeparator: statusSeparator,
-		ErrorsSeparator: errorsSeparator,
-	}
-}
-
-// CopyLogErrorFormat creates a copy of a log error format
-func CopyLogErrorFormat(format *LogErrorFormat) *LogErrorFormat {
-	return &LogErrorFormat{
-		StatusSeparator: format.StatusSeparator,
-		ErrorsSeparator: format.ErrorsSeparator,
-	}
-}
-
-// DefaultLogErrorFormat is the default log error format
-var DefaultLogErrorFormat = NewLogErrorFormat(
-	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	gologgerstrings.NewMultilineSeparator(
-		gologgerstrings.SpaceSeparator,
-		gologgerstrings.NewLineSeparator,
-		1,
-	),
-)
-
-// NewLoggerFormat creates a new logger format
-func NewLoggerFormat(
-	nameSeparator *gologgerstrings.ContentSeparator,
-	messageSeparator gologgerstrings.Separator,
-) *LoggerFormat {
-	return &LoggerFormat{
-		NameSeparator:    nameSeparator,
-		MessageSeparator: messageSeparator,
-	}
-}
-
-// CopyLoggerFormat creates a copy of a logger format
-func CopyLoggerFormat(format *LoggerFormat) *LoggerFormat {
-	return &LoggerFormat{
-		NameSeparator:    format.NameSeparator,
-		MessageSeparator: format.MessageSeparator,
-	}
-}
-
-// DefaultLoggerFormat is the default logger format
-var DefaultLoggerFormat = NewLoggerFormat(
-	gologgerstrings.NewRepeatedContentSeparator(gologgerstrings.SpaceSeparator),
-	gologgerstrings.SpaceSeparator,
 )
 
 // NewLogMessage creates a new log message
 func NewLogMessage(
 	title string,
 	status gologgerstatus.Status,
-	format *LogMessageFormat,
 	details ...string,
 ) *LogMessage {
-	// Check if the format is nil
-	if format == nil {
-		format = DefaultLogMessageFormat
-	}
-
 	return &LogMessage{
 		title:   title,
 		status:  status,
 		details: details,
-		format:  CopyLogMessageFormat(format),
 	}
 }
 
 // FormatDetails gets the formatted details
 func (l *LogMessage) FormatDetails() string {
 	return gologgerstrings.FormatStringArray(
-		l.format.DetailsSeparator,
+		DetailsSeparator,
 		&l.details,
 	)
 }
@@ -174,10 +91,10 @@ func (l *LogMessage) String() string {
 	var formattedLog []string
 
 	// Format status
-	if l.status != gologgerstatus.StatusNone {
+	if l.status != gologgerstatus.None {
 		formattedLog = append(
 			formattedLog,
-			gologgerstrings.FormatStatus(l.status, l.format.StatusSeparator),
+			gologgerstrings.FormatStatus(StatusSeparator, l.status),
 		)
 	}
 
@@ -197,24 +114,17 @@ func (l *LogMessage) String() string {
 // NewLogError creates a new log error
 func NewLogError(
 	title string,
-	format *LogErrorFormat,
 	errors ...error,
 ) *LogError {
-	// Check if the format is nil
-	if format == nil {
-		format = DefaultLogErrorFormat
-	}
-
 	return &LogError{
 		title:  title,
 		errors: errors,
-		format: CopyLogErrorFormat(format),
 	}
 }
 
 // FormatErrors gets the formatted errors
 func (l *LogError) FormatErrors() string {
-	return gologgerstrings.FormatErrorArray(l.format.ErrorsSeparator, &l.errors)
+	return gologgerstrings.FormatErrorArray(ErrorsSeparator, &l.errors)
 }
 
 // String gets the string representation of a log error
@@ -225,8 +135,8 @@ func (l *LogError) String() string {
 	formattedLog = append(
 		formattedLog,
 		gologgerstrings.FormatStatus(
-			gologgerstatus.StatusFailed,
-			l.format.StatusSeparator,
+			StatusSeparator,
+			gologgerstatus.Failed,
 		),
 	)
 
@@ -244,16 +154,10 @@ func (l *LogError) String() string {
 }
 
 // NewDefaultLogger creates a new logger
-func NewDefaultLogger(name string, format *LoggerFormat) *DefaultLogger {
-	// Check if the format is nil
-	if format == nil {
-		format = DefaultLoggerFormat
-	}
-
+func NewDefaultLogger(name string) *DefaultLogger {
 	return &DefaultLogger{
 		name:          name,
-		formattedName: gologgerstrings.AddBrackets(name, format.NameSeparator),
-		format:        CopyLoggerFormat(format),
+		formattedName: gologgerstrings.AddBrackets(NameSeparator, name),
 	}
 }
 
@@ -266,7 +170,7 @@ func (d *DefaultLogger) FormatLogMessage(logMessage *LogMessage) string {
 
 	return strings.Join(
 		[]string{d.formattedName, logMessage.String()},
-		string(d.format.MessageSeparator),
+		string(MessageSeparator),
 	)
 }
 
@@ -286,7 +190,7 @@ func (d *DefaultLogger) FormatLogError(logError *LogError) string {
 		[]string{
 			d.formattedName,
 			logError.String(),
-		}, string(d.format.MessageSeparator),
+		}, string(MessageSeparator),
 	)
 }
 

@@ -1,70 +1,15 @@
 package strings
 
 import (
+	gologgerseparator "github.com/ralvarezdev/go-logger/separator"
 	gologgerstatus "github.com/ralvarezdev/go-logger/status"
 	"strings"
 )
 
-type (
-	// Separator is the separator for a string
-	Separator string
-
-	// ContentSeparator is the separator for the content
-	ContentSeparator struct {
-		LeftSeparator  Separator
-		RightSeparator Separator
-	}
-
-	// MultilineSeparator is the separator for the multiline content
-	MultilineSeparator struct {
-		SingleLineSeparator Separator
-		LineSeparator       Separator
-		TabSize             int
-	}
-)
-
-// Separator constants
-const (
-	SpaceSeparator   Separator = " "
-	CommaSeparator   Separator = ","
-	NewLineSeparator Separator = "\n"
-	TabSeparator     Separator = "\t"
-)
-
-// NewContentSeparator creates a new content separator
-func NewContentSeparator(leftSeparator, rightSeparator Separator) *ContentSeparator {
-	return &ContentSeparator{
-		LeftSeparator:  leftSeparator,
-		RightSeparator: rightSeparator,
-	}
-}
-
-// NewRepeatedContentSeparator creates a new content separator with the same separator
-func NewRepeatedContentSeparator(separator Separator) *ContentSeparator {
-	return NewContentSeparator(separator, separator)
-}
-
-// NewMultilineSeparator creates a new multiline separator
-func NewMultilineSeparator(
-	singleLineSeparator, lineSeparator Separator,
-	tabSize int,
-) *MultilineSeparator {
-	return &MultilineSeparator{
-		SingleLineSeparator: singleLineSeparator,
-		LineSeparator:       lineSeparator,
-		TabSize:             tabSize,
-	}
-}
-
-// TabSeparator returns a tab separator
-func (m *MultilineSeparator) TabSeparator() Separator {
-	return Separator(strings.Repeat(string(TabSeparator), m.TabSize))
-}
-
 // AddCharacters adds some characters to a string
 func AddCharacters(
+	contentSeparator *gologgerseparator.Content,
 	content, leftCharacters, rightCharacters string,
-	contentSeparator *ContentSeparator,
 ) string {
 	if contentSeparator == nil {
 		return strings.Join(
@@ -76,40 +21,49 @@ func AddCharacters(
 	return strings.Join(
 		[]string{
 			leftCharacters,
-			string(contentSeparator.LeftSeparator),
+			string(contentSeparator.Left),
 			content,
-			string(contentSeparator.RightSeparator),
+			string(contentSeparator.Right),
 			rightCharacters,
 		}, "",
 	)
 }
 
 // AddBrackets adds brackets to a string
-func AddBrackets(name string, contentSeparator *ContentSeparator) string {
-	return AddCharacters(name, "[", "]", contentSeparator)
+func AddBrackets(
+	contentSeparator *gologgerseparator.Content,
+	content string,
+) string {
+	return AddCharacters(contentSeparator, content, "[", "]")
 }
 
 // AddCurlyBrackets adds curly brackets to a string
-func AddCurlyBrackets(name string, contentSeparator *ContentSeparator) string {
-	return AddCharacters(name, "{", "}", contentSeparator)
+func AddCurlyBrackets(
+	contentSeparator *gologgerseparator.Content,
+	content string,
+) string {
+	return AddCharacters(contentSeparator, content, "{", "}")
 }
 
 // AddParentheses adds parentheses to a string
-func AddParentheses(name string, contentSeparator *ContentSeparator) string {
-	return AddCharacters(name, "(", ")", contentSeparator)
+func AddParentheses(
+	contentSeparator *gologgerseparator.Content,
+	content string,
+) string {
+	return AddCharacters(contentSeparator, content, "(", ")")
 }
 
 // FormatStatus gets the formatted status
 func FormatStatus(
+	contentSeparator *gologgerseparator.Content,
 	status gologgerstatus.Status,
-	contentSeparator *ContentSeparator,
 ) string {
-	return AddBrackets(status.String(), contentSeparator)
+	return AddBrackets(contentSeparator, status.String())
 }
 
 // FormatStringArray returns a string with all the strings in the array formatted
 func FormatStringArray(
-	multilineSeparator *MultilineSeparator,
+	multilineSeparator *gologgerseparator.Multiline,
 	stringArray *[]string,
 ) string {
 	if stringArray == nil || len(*stringArray) == 0 {
@@ -119,15 +73,15 @@ func FormatStringArray(
 	// Check if there is only one element
 	if len(*stringArray) == 1 {
 		return AddBrackets(
+			gologgerseparator.NewRepeatedContent(multilineSeparator.SingleLine),
 			(*stringArray)[0],
-			NewRepeatedContentSeparator(multilineSeparator.SingleLineSeparator),
 		)
 	} else {
 		var formattedDetails strings.Builder
 
 		// Separators
-		lineSeparator := multilineSeparator.LineSeparator
-		tabSeparator := multilineSeparator.TabSeparator()
+		lineSeparator := multilineSeparator.Line
+		tabSeparator := multilineSeparator.Tab()
 		lineAndTabSeparator := lineSeparator + tabSeparator
 
 		// Add formatted details
@@ -141,8 +95,8 @@ func FormatStringArray(
 		}
 
 		return AddBrackets(
+			gologgerseparator.NewRepeatedContent(lineSeparator),
 			formattedDetails.String(),
-			NewRepeatedContentSeparator(lineSeparator),
 		)
 	}
 }
@@ -163,7 +117,7 @@ func MapErrorArrayToStringArray(errorArray *[]error) *[]string {
 
 // FormatErrorArray returns a string with all the errors in the array formatted
 func FormatErrorArray(
-	multilineSeparator *MultilineSeparator,
+	multilineSeparator *gologgerseparator.Multiline,
 	errorArray *[]error,
 ) string {
 	mappedErrorArray := MapErrorArrayToStringArray(errorArray)
