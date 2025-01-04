@@ -41,40 +41,50 @@ type (
 
 	// LogMessage struct
 	LogMessage struct {
-		title   string
-		details []string
-		status  gologgerstatus.Status
+		subheader string
+		details   []string
+		status    gologgerstatus.Status
 	}
 
 	// LogError struct
 	LogError struct {
-		title  string
-		errors []error
+		subheader string
+		errors    []error
 	}
 
 	// Logger is an interface for logging messages
 	Logger interface {
+		LogMessage(header string, logMessage *LogMessage)
+		LogError(header string, logError *LogError)
+	}
+
+	// SubLogger is an interface for logging messages with a name
+	SubLogger interface {
 		LogMessage(logMessage *LogMessage)
 		LogError(logError *LogError)
 	}
 
 	// DefaultLogger is a logger that logs messages
-	DefaultLogger struct {
+	DefaultLogger struct{}
+
+	// DefaultSubLogger is a logger that logs messages with a name
+	DefaultSubLogger struct {
 		name          string
 		formattedName string
+		logger        Logger
 	}
 )
 
 // NewLogMessage creates a new log message
 func NewLogMessage(
-	title string,
+	subheader string,
 	status gologgerstatus.Status,
 	details ...string,
 ) *LogMessage {
 	return &LogMessage{
-		title:   title,
-		status:  status,
-		details: details,
+		subheader: subheader,
+		status:    status,
+		details:   details,
 	}
 }
 
@@ -98,9 +108,9 @@ func (l *LogMessage) String() string {
 		)
 	}
 
-	// Add title
-	if l.title != "" {
-		formattedLog = append(formattedLog, l.title)
+	// Add subheader
+	if l.subheader != "" {
+		formattedLog = append(formattedLog, l.subheader)
 	}
 
 	// Add formatted details
@@ -113,12 +123,12 @@ func (l *LogMessage) String() string {
 
 // NewLogError creates a new log error
 func NewLogError(
-	title string,
+	subheader string,
 	errors ...error,
 ) *LogError {
 	return &LogError{
-		title:  title,
-		errors: errors,
+		subheader: subheader,
+		errors:    errors,
 	}
 }
 
@@ -140,9 +150,9 @@ func (l *LogError) String() string {
 		),
 	)
 
-	// Add message
-	if l.title != "" {
-		formattedLog = append(formattedLog, l.title)
+	// Add subheader
+	if l.subheader != "" {
+		formattedLog = append(formattedLog, l.subheader)
 	}
 
 	// Add formatted errors
@@ -154,47 +164,67 @@ func (l *LogError) String() string {
 }
 
 // NewDefaultLogger creates a new logger
-func NewDefaultLogger(name string) *DefaultLogger {
-	return &DefaultLogger{
-		name:          name,
-		formattedName: gologgerstrings.AddBrackets(NameSeparator, name),
-	}
+func NewDefaultLogger() *DefaultLogger {
+	return &DefaultLogger{}
 }
 
 // FormatLogMessage formats a log message
-func (d *DefaultLogger) FormatLogMessage(logMessage *LogMessage) string {
-	// Check if the log message is nil
-	if logMessage == nil {
-		return d.formattedName
-	}
-
+func (d *DefaultLogger) FormatLogMessage(
+	header string,
+	logMessage *LogMessage,
+) string {
 	return strings.Join(
-		[]string{d.formattedName, logMessage.String()},
+		[]string{header, logMessage.String()},
 		string(MessageSeparator),
 	)
 }
 
 // LogMessage logs a message
-func (d *DefaultLogger) LogMessage(logMessage *LogMessage) {
-	log.Println(d.FormatLogMessage(logMessage))
+func (d *DefaultLogger) LogMessage(header string, logMessage *LogMessage) {
+	log.Println(d.FormatLogMessage(header, logMessage))
 }
 
 // FormatLogError formats a log error
-func (d *DefaultLogger) FormatLogError(logError *LogError) string {
-	// Check if the log error is nil
-	if logError == nil {
-		return d.formattedName
-	}
-
+func (d *DefaultLogger) FormatLogError(
+	header string,
+	logError *LogError,
+) string {
 	return strings.Join(
 		[]string{
-			d.formattedName,
+			header,
 			logError.String(),
 		}, string(MessageSeparator),
 	)
 }
 
 // LogError logs an error
-func (d *DefaultLogger) LogError(logError *LogError) {
-	log.Println(d.FormatLogError(logError))
+func (d *DefaultLogger) LogError(header string, logError *LogError) {
+	log.Println(d.FormatLogError(header, logError))
+}
+
+// NewDefaultSubLogger creates a new sub logger
+func NewDefaultSubLogger(name string, logger Logger) (
+	*DefaultSubLogger,
+	error,
+) {
+	// Check if the logger is nil
+	if logger == nil {
+		return nil, ErrNilLogger
+	}
+
+	return &DefaultSubLogger{
+		name:          name,
+		formattedName: gologgerstrings.AddBrackets(NameSeparator, name),
+		logger:        logger,
+	}, nil
+}
+
+// LogMessage logs a message
+func (d *DefaultSubLogger) LogMessage(logMessage *LogMessage) {
+	d.logger.LogMessage(d.formattedName, logMessage)
+}
+
+// LogError logs an error
+func (d *DefaultSubLogger) LogError(logError *LogError) {
+	d.logger.LogError(d.formattedName, logError)
 }
