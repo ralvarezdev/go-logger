@@ -66,6 +66,11 @@ func NewMessage(
 	}
 }
 
+// Status returns the status of a message
+func (m *Message) Status() gologgerstatus.Status {
+	return m.status
+}
+
 // String gets the string representation of a message
 func (m *Message) String() string {
 	var formattedMessage []string
