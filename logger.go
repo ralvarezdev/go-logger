@@ -41,11 +41,11 @@ type (
 	// Logger is an interface for logging messages
 	Logger interface {
 		Log(message *Message)
-		Info(header, subheader string, details ...string)
-		Error(header, subheader string, errors ...error)
-		Debug(header, subheader string, details ...string)
-		Critical(header, subheader string, details ...string)
-		Warning(header, subheader string, details ...string)
+		Info(header, subheader string, details *[]string)
+		Error(header, subheader string, errors *[]error)
+		Debug(header, subheader string, details *[]string)
+		Critical(header, subheader string, details *[]string)
+		Warning(header, subheader string, details *[]string)
 	}
 
 	// DefaultLogger is a logger that logs messages
@@ -138,19 +138,19 @@ func (d *DefaultLogger) BuildAndLog(
 }
 
 // Info logs an info message
-func (d *DefaultLogger) Info(header, subheader string, details ...string) {
+func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
-		&details,
+		details,
 		gologgerstatus.Info,
 	)
 }
 
 // Error logs an error message
-func (d *DefaultLogger) Error(header, subheader string, errors ...error) {
+func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
 	// Map errors to a string array
-	mappedErrors := gologgerstrings.MapErrorArrayToStringArray(&errors)
+	mappedErrors := gologgerstrings.MapErrorArrayToStringArray(errors)
 	d.BuildAndLog(
 		header,
 		subheader,
@@ -160,31 +160,31 @@ func (d *DefaultLogger) Error(header, subheader string, errors ...error) {
 }
 
 // Debug logs a debug message
-func (d *DefaultLogger) Debug(header, subheader string, details ...string) {
+func (d *DefaultLogger) Debug(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
-		&details,
+		details,
 		gologgerstatus.Debug,
 	)
 }
 
 // Critical logs a critical message
-func (d *DefaultLogger) Critical(header, subheader string, details ...string) {
+func (d *DefaultLogger) Critical(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
-		&details,
+		details,
 		gologgerstatus.Critical,
 	)
 }
 
 // Warning logs a warning message
-func (d *DefaultLogger) Warning(header, subheader string, details ...string) {
+func (d *DefaultLogger) Warning(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
-		&details,
+		details,
 		gologgerstatus.Warning,
 	)
 }
