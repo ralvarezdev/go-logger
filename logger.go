@@ -58,12 +58,6 @@ type (
 		LogError(header string, logError *LogError)
 	}
 
-	// SubLogger is an interface for logging messages with a name
-	SubLogger interface {
-		LogMessage(logMessage *LogMessage)
-		LogError(logError *LogError)
-	}
-
 	// DefaultLogger is a logger that logs messages
 	DefaultLogger struct{}
 
@@ -200,31 +194,4 @@ func (d *DefaultLogger) FormatLogError(
 // LogError logs an error
 func (d *DefaultLogger) LogError(header string, logError *LogError) {
 	log.Println(d.FormatLogError(header, logError))
-}
-
-// NewDefaultSubLogger creates a new sub logger
-func NewDefaultSubLogger(name string, logger Logger) (
-	*DefaultSubLogger,
-	error,
-) {
-	// Check if the logger is nil
-	if logger == nil {
-		return nil, ErrNilLogger
-	}
-
-	return &DefaultSubLogger{
-		name:          name,
-		formattedName: gologgerstrings.AddBrackets(NameSeparator, name),
-		logger:        logger,
-	}, nil
-}
-
-// LogMessage logs a message
-func (d *DefaultSubLogger) LogMessage(logMessage *LogMessage) {
-	d.logger.LogMessage(d.formattedName, logMessage)
-}
-
-// LogError logs an error
-func (d *DefaultSubLogger) LogError(logError *LogError) {
-	d.logger.LogError(d.formattedName, logError)
 }
