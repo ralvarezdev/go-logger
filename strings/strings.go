@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type (
+	// AddCharactersFn is a function that adds characters to a string
+	AddCharactersFn func(*gologgerseparator.Content, string) string
+)
+
 // AddCharacters adds some characters to a string
 func AddCharacters(
 	contentSeparator *gologgerseparator.Content,
@@ -53,26 +58,43 @@ func AddParentheses(
 	return AddCharacters(contentSeparator, content, "(", ")")
 }
 
+// FormatString returns a formatted string
+func FormatString(
+	contentSeparator *gologgerseparator.Content,
+	content string,
+	addCharactersFn AddCharactersFn,
+) string {
+	// Check if the addCharactersFn is nil
+	if addCharactersFn == nil {
+		return ""
+	}
+
+	return addCharactersFn(contentSeparator, content)
+}
+
 // FormatStatus gets the formatted status
 func FormatStatus(
 	contentSeparator *gologgerseparator.Content,
 	status gologgerstatus.Status,
+	addCharactersFn AddCharactersFn,
 ) string {
-	return AddBrackets(contentSeparator, status.String())
+	return FormatString(contentSeparator, status.String(), addCharactersFn)
 }
 
 // FormatStringArray returns a string with all the strings in the array formatted
 func FormatStringArray(
 	multilineSeparator *gologgerseparator.Multiline,
 	stringArray *[]string,
+	addCharactersFn AddCharactersFn,
 ) string {
-	if stringArray == nil || len(*stringArray) == 0 {
+	// Check if the stringArray is nil or empty, or the addCharactersFn is nil
+	if stringArray == nil || len(*stringArray) == 0 || addCharactersFn == nil {
 		return ""
 	}
 
 	// Check if there is only one element
 	if len(*stringArray) == 1 {
-		return AddBrackets(
+		return addCharactersFn(
 			gologgerseparator.NewRepeatedContent(multilineSeparator.SingleLine),
 			(*stringArray)[0],
 		)
@@ -94,7 +116,7 @@ func FormatStringArray(
 			}
 		}
 
-		return AddBrackets(
+		return addCharactersFn(
 			gologgerseparator.NewRepeatedContent(lineSeparator),
 			formattedDetails.String(),
 		)
@@ -119,7 +141,12 @@ func MapErrorArrayToStringArray(errorArray *[]error) *[]string {
 func FormatErrorArray(
 	multilineSeparator *gologgerseparator.Multiline,
 	errorArray *[]error,
+	addCharactersFn AddCharactersFn,
 ) string {
 	mappedErrorArray := MapErrorArrayToStringArray(errorArray)
-	return FormatStringArray(multilineSeparator, mappedErrorArray)
+	return FormatStringArray(
+		multilineSeparator,
+		mappedErrorArray,
+		addCharactersFn,
+	)
 }

@@ -6,36 +6,26 @@ type (
 )
 
 const (
-	Success Status = iota
-	Failed
-	Error
-	Warning
-	Info
+	Info Status = iota
 	Debug
-	Trace
-	None
-	Unknown
+	Warning
+	Error
+	Critical
 )
 
 // String returns the string representation of the status
 func (s Status) String() string {
 	switch s {
-	case Success:
-		return "SUCCESS"
-	case Failed:
-		return "FAILED"
-	case Error:
-		return "ERROR"
-	case Warning:
-		return "WARNING"
 	case Info:
 		return "INFO"
 	case Debug:
 		return "DEBUG"
-	case Trace:
-		return "TRACE"
-	case None:
-		return ""
+	case Warning:
+		return "WARNING"
+	case Error:
+		return "ERROR"
+	case Critical:
+		return "CRITICAL"
 	default:
 		return "UNKNOWN"
 	}

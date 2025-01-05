@@ -9,152 +9,106 @@ import (
 )
 
 var (
+	// HeaderSeparator is the header separator
+	HeaderSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
+
 	// StatusSeparator is the status separator
 	StatusSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
 
-	// ErrorsSeparator is the errors separator
-	ErrorsSeparator = gologgerseparator.NewMultiline(
+	// DescriptionSeparator is the description separator
+	DescriptionSeparator = gologgerseparator.NewMultiline(
 		gologgerseparator.Space,
 		gologgerseparator.NewLine,
 		1,
 	)
-
-	// DetailsSeparator is the details separator
-	DetailsSeparator = gologgerseparator.NewMultiline(
-		gologgerseparator.Space,
-		gologgerseparator.NewLine,
-		1,
-	)
-
-	// NameSeparator is the name separator
-	NameSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
 
 	// MessageSeparator is the message separator
 	MessageSeparator = gologgerseparator.Space
+
+	// AddCharactersFn is the add characters function
+	AddCharactersFn = gologgerstrings.AddBrackets
 )
 
 type (
-	// Log interface
-	Log interface {
-		String() string
-	}
-
-	// LogMessage struct
-	LogMessage struct {
-		subheader string
-		details   []string
-		status    gologgerstatus.Status
-	}
-
-	// LogError struct
-	LogError struct {
-		subheader string
-		errors    []error
+	// Message struct
+	Message struct {
+		header      string
+		subheader   string
+		description *[]string
+		status      gologgerstatus.Status
 	}
 
 	// Logger is an interface for logging messages
 	Logger interface {
-		LogMessage(header string, logMessage *LogMessage)
-		LogError(header string, logError *LogError)
+		Log(message *Message)
+		Info(header, subheader string, details ...string)
+		Error(header, subheader string, errors ...error)
+		Debug(header, subheader string, details ...string)
+		Critical(header, subheader string, details ...string)
+		Warning(header, subheader string, details ...string)
 	}
 
 	// DefaultLogger is a logger that logs messages
 	DefaultLogger struct{}
-
-	// DefaultSubLogger is a logger that logs messages with a name
-	DefaultSubLogger struct {
-		name          string
-		formattedName string
-		logger        Logger
-	}
 )
 
-// NewLogMessage creates a new log message
-func NewLogMessage(
-	subheader string,
+// NewMessage creates a new message
+func NewMessage(
+	header, subheader string,
 	status gologgerstatus.Status,
-	details ...string,
-) *LogMessage {
-	return &LogMessage{
-		subheader: subheader,
-		status:    status,
-		details:   details,
+	description *[]string,
+) *Message {
+	return &Message{
+		header:      header,
+		subheader:   subheader,
+		status:      status,
+		description: description,
 	}
 }
 
-// FormatDetails gets the formatted details
-func (l *LogMessage) FormatDetails() string {
-	return gologgerstrings.FormatStringArray(
-		DetailsSeparator,
-		&l.details,
-	)
-}
+// String gets the string representation of a message
+func (m *Message) String() string {
+	var formattedMessage []string
 
-// String gets the string representation of a log message
-func (l *LogMessage) String() string {
-	var formattedLog []string
-
-	// Format status
-	if l.status != gologgerstatus.None {
-		formattedLog = append(
-			formattedLog,
-			gologgerstrings.FormatStatus(StatusSeparator, l.status),
+	// Add header
+	if m.header != "" {
+		formattedMessage = append(
+			formattedMessage,
+			gologgerstrings.FormatString(
+				HeaderSeparator,
+				m.header,
+				AddCharactersFn,
+			),
 		)
 	}
 
-	// Add subheader
-	if l.subheader != "" {
-		formattedLog = append(formattedLog, l.subheader)
-	}
-
-	// Add formatted details
-	if len(l.details) > 0 {
-		formattedLog = append(formattedLog, l.FormatDetails())
-	}
-
-	return strings.Join(formattedLog, " ")
-}
-
-// NewLogError creates a new log error
-func NewLogError(
-	subheader string,
-	errors ...error,
-) *LogError {
-	return &LogError{
-		subheader: subheader,
-		errors:    errors,
-	}
-}
-
-// FormatErrors gets the formatted errors
-func (l *LogError) FormatErrors() string {
-	return gologgerstrings.FormatErrorArray(ErrorsSeparator, &l.errors)
-}
-
-// String gets the string representation of a log error
-func (l *LogError) String() string {
-	var formattedLog []string
-
 	// Format status
-	formattedLog = append(
-		formattedLog,
+	formattedMessage = append(
+		formattedMessage,
 		gologgerstrings.FormatStatus(
 			StatusSeparator,
-			gologgerstatus.Failed,
+			m.status,
+			AddCharactersFn,
 		),
 	)
 
 	// Add subheader
-	if l.subheader != "" {
-		formattedLog = append(formattedLog, l.subheader)
+	if m.subheader != "" {
+		formattedMessage = append(formattedMessage, m.subheader)
 	}
 
-	// Add formatted errors
-	if len(l.errors) > 0 {
-		formattedLog = append(formattedLog, l.FormatErrors())
+	// Add formatted description
+	if m.description != nil && len(*m.description) > 0 {
+		formattedMessage = append(
+			formattedMessage, gologgerstrings.FormatStringArray(
+				DescriptionSeparator,
+				m.description,
+				AddCharactersFn,
+			),
+		)
 	}
 
-	return strings.Join(formattedLog, " ")
+	return strings.Join(formattedMessage, string(MessageSeparator))
 }
 
 // NewDefaultLogger creates a new logger
@@ -162,36 +116,75 @@ func NewDefaultLogger() *DefaultLogger {
 	return &DefaultLogger{}
 }
 
-// FormatLogMessage formats a log message
-func (d *DefaultLogger) FormatLogMessage(
-	header string,
-	logMessage *LogMessage,
-) string {
-	return strings.Join(
-		[]string{header, logMessage.String()},
-		string(MessageSeparator),
+// Log logs a message
+func (d *DefaultLogger) Log(message *Message) {
+	log.Println(message.String())
+}
+
+// BuildAndLog builds a message and logs it
+func (d *DefaultLogger) BuildAndLog(
+	header, subheader string,
+	details *[]string,
+	status gologgerstatus.Status,
+) {
+	// Create a new message and log it
+	message := NewMessage(
+		header,
+		subheader,
+		status,
+		details,
+	)
+	d.Log(message)
+}
+
+// Info logs an info message
+func (d *DefaultLogger) Info(header, subheader string, details ...string) {
+	d.BuildAndLog(
+		header,
+		subheader,
+		&details,
+		gologgerstatus.Info,
 	)
 }
 
-// LogMessage logs a message
-func (d *DefaultLogger) LogMessage(header string, logMessage *LogMessage) {
-	log.Println(d.FormatLogMessage(header, logMessage))
-}
-
-// FormatLogError formats a log error
-func (d *DefaultLogger) FormatLogError(
-	header string,
-	logError *LogError,
-) string {
-	return strings.Join(
-		[]string{
-			header,
-			logError.String(),
-		}, string(MessageSeparator),
+// Error logs an error message
+func (d *DefaultLogger) Error(header, subheader string, errors ...error) {
+	// Map errors to a string array
+	mappedErrors := gologgerstrings.MapErrorArrayToStringArray(&errors)
+	d.BuildAndLog(
+		header,
+		subheader,
+		mappedErrors,
+		gologgerstatus.Error,
 	)
 }
 
-// LogError logs an error
-func (d *DefaultLogger) LogError(header string, logError *LogError) {
-	log.Println(d.FormatLogError(header, logError))
+// Debug logs a debug message
+func (d *DefaultLogger) Debug(header, subheader string, details ...string) {
+	d.BuildAndLog(
+		header,
+		subheader,
+		&details,
+		gologgerstatus.Debug,
+	)
+}
+
+// Critical logs a critical message
+func (d *DefaultLogger) Critical(header, subheader string, details ...string) {
+	d.BuildAndLog(
+		header,
+		subheader,
+		&details,
+		gologgerstatus.Critical,
+	)
+}
+
+// Warning logs a warning message
+func (d *DefaultLogger) Warning(header, subheader string, details ...string) {
+	d.BuildAndLog(
+		header,
+		subheader,
+		&details,
+		gologgerstatus.Warning,
+	)
 }
