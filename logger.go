@@ -1,32 +1,34 @@
 package go_logger
 
 import (
-	gologgerseparator "github.com/ralvarezdev/go-logger/separator"
 	gologgerstatus "github.com/ralvarezdev/go-logger/status"
-	gologgerstrings "github.com/ralvarezdev/go-logger/strings"
+	gostringsadd "github.com/ralvarezdev/go-strings/add"
+	gostringsaddformat "github.com/ralvarezdev/go-strings/add/format"
+	gostringsconvert "github.com/ralvarezdev/go-strings/convert"
+	gostringsseparator "github.com/ralvarezdev/go-strings/separator"
 	"log"
 	"strings"
 )
 
 var (
 	// HeaderSeparator is the header separator
-	HeaderSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
+	HeaderSeparator = gostringsseparator.NewRepeatedContent(gostringsseparator.Space)
 
 	// StatusSeparator is the status separator
-	StatusSeparator = gologgerseparator.NewRepeatedContent(gologgerseparator.Space)
+	StatusSeparator = gostringsseparator.NewRepeatedContent(gostringsseparator.Space)
 
 	// DescriptionSeparator is the description separator
-	DescriptionSeparator = gologgerseparator.NewMultiline(
-		gologgerseparator.Space,
-		gologgerseparator.NewLine,
+	DescriptionSeparator = gostringsseparator.NewMultiline(
+		gostringsseparator.Space,
+		gostringsseparator.NewLine,
 		1,
 	)
 
 	// MessageSeparator is the message separator
-	MessageSeparator = gologgerseparator.Space
+	MessageSeparator = gostringsseparator.Space
 
 	// AddCharactersFn is the add characters function
-	AddCharactersFn = gologgerstrings.AddBrackets
+	AddCharactersFn = gostringsadd.Brackets
 )
 
 type (
@@ -79,10 +81,9 @@ func (m *Message) String() string {
 	if m.header != "" {
 		formattedMessage = append(
 			formattedMessage,
-			gologgerstrings.FormatString(
+			AddCharactersFn(
 				HeaderSeparator,
 				m.header,
-				AddCharactersFn,
 			),
 		)
 	}
@@ -90,9 +91,8 @@ func (m *Message) String() string {
 	// Format status
 	formattedMessage = append(
 		formattedMessage,
-		gologgerstrings.FormatStatus(
+		m.status.Format(
 			StatusSeparator,
-			m.status,
 			AddCharactersFn,
 		),
 	)
@@ -105,7 +105,7 @@ func (m *Message) String() string {
 	// Add formatted description
 	if m.description != nil && len(*m.description) > 0 {
 		formattedMessage = append(
-			formattedMessage, gologgerstrings.FormatStringArray(
+			formattedMessage, gostringsaddformat.StringArray(
 				DescriptionSeparator,
 				m.description,
 				AddCharactersFn,
@@ -155,7 +155,7 @@ func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
 // Error logs an error message
 func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
 	// Map errors to a string array
-	mappedErrors := gologgerstrings.MapErrorArrayToStringArray(errors)
+	mappedErrors := gostringsconvert.ErrorArrayToStringArray(errors)
 	d.BuildAndLog(
 		header,
 		subheader,

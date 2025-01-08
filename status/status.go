@@ -1,5 +1,10 @@
 package status
 
+import (
+	gostringsadd "github.com/ralvarezdev/go-strings/add"
+	gostringsseparator "github.com/ralvarezdev/go-strings/separator"
+)
+
 type (
 	// Status is the status of the logger
 	Status int
@@ -29,4 +34,12 @@ func (s Status) String() string {
 	default:
 		return "UNKNOWN"
 	}
+}
+
+// Format gets the formatted status
+func (s Status) Format(
+	contentSeparator *gostringsseparator.Content,
+	addCharactersFn gostringsadd.CharactersFn,
+) string {
+	return addCharactersFn(contentSeparator, s.String())
 }
