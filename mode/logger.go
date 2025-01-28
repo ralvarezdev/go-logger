@@ -30,7 +30,7 @@ func NewDefaultLogger(logger gologger.Logger) (
 		return nil, gologger.ErrNilLogger
 	}
 
-	return &DefaultLogger{logger: logger}, nil
+	return &DefaultLogger{logger}, nil
 }
 
 // Log logs a message

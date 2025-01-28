@@ -32,7 +32,7 @@ func NewDefaultLogger(header string, logger gologgermode.Logger) (
 		return nil, gologger.ErrNilLogger
 	}
 
-	return &DefaultLogger{header: header, logger: logger}, nil
+	return &DefaultLogger{header, logger}, nil
 }
 
 // Info logs an info message

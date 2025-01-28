@@ -57,14 +57,14 @@ type (
 // NewMessage creates a new message
 func NewMessage(
 	header, subheader string,
-	status gologgerstatus.Status,
 	description *[]string,
+	status gologgerstatus.Status,
 ) *Message {
 	return &Message{
-		header:      header,
-		subheader:   subheader,
-		status:      status,
-		description: description,
+		header,
+		subheader,
+		description,
+		status,
 	}
 }
 
@@ -136,8 +136,8 @@ func (d *DefaultLogger) BuildAndLog(
 	message := NewMessage(
 		header,
 		subheader,
-		status,
 		details,
+		status,
 	)
 	d.Log(message)
 }
