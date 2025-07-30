@@ -1,13 +1,14 @@
 package go_logger
 
 import (
+	"log"
+	"strings"
+
 	gologgerstatus "github.com/ralvarezdev/go-logger/status"
 	gostringsadd "github.com/ralvarezdev/go-strings/add"
 	gostringsaddformat "github.com/ralvarezdev/go-strings/add/format"
 	gostringsconvert "github.com/ralvarezdev/go-strings/convert"
 	gostringsseparator "github.com/ralvarezdev/go-strings/separator"
-	"log"
-	"strings"
 )
 
 var (
