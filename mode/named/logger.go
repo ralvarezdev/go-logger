@@ -6,23 +6,57 @@ import (
 )
 
 type (
-	// Logger interface for the mode logger
+	// Logger provides methods for logging messages at various severity levels for a specific mode.
 	Logger interface {
+		// Info logs an informational message.
+		//
+		// Parameters:
+		//   subheader - a short description of the message.
+		//   details - optional additional details.
 		Info(subheader string, details ...string)
+		// Error logs an error message.
+		//
+		// Parameters:
+		//   subheader - a short description of the error.
+		//   errors - the error values to log.
 		Error(subheader string, errors ...error)
+		// Debug logs a debug message.
+		//
+		// Parameters:
+		//   subheader - a short description of the message.
+		//   details - optional additional details.
 		Debug(subheader string, details ...string)
+		// Critical logs a critical message.
+		//
+		// Parameters:
+		//   subheader - a short description of the message.
+		//   details - optional additional details.
 		Critical(subheader string, details ...string)
+		// Warning logs a warning message.
+		//
+		// Parameters:
+		//   subheader - a short description of the message.
+		//   details - optional additional details.
 		Warning(subheader string, details ...string)
 	}
 
-	// DefaultLogger is the default mode logger
+	// DefaultLogger is the default mode logger that prefixes messages with a header.
 	DefaultLogger struct {
 		header string
 		logger gologgermode.Logger
 	}
 )
 
-// NewDefaultLogger creates a new default mode logger
+// NewDefaultLogger creates a new DefaultLogger with the given header and logger.
+//
+// Parameters:
+//
+//	header - the prefix for all log messages.
+//	logger - the underlying logger to delegate to.
+//
+// Returns:
+//
+//	A pointer to DefaultLogger and an error if logger is nil.
 func NewDefaultLogger(header string, logger gologgermode.Logger) (
 	*DefaultLogger,
 	error,
@@ -35,27 +69,52 @@ func NewDefaultLogger(header string, logger gologgermode.Logger) (
 	return &DefaultLogger{header, logger}, nil
 }
 
-// Info logs an info message
-func (d *DefaultLogger) Info(subheader string, details ...string) {
+// Info logs an informational message with the DefaultLogger's header.
+//
+// Parameters:
+//
+//	subheader - a short description of the message.
+//	details - optional additional details.
+func (d DefaultLogger) Info(subheader string, details ...string) {
 	d.logger.Info(d.header, subheader, &details)
 }
 
-// Error logs an error message
-func (d *DefaultLogger) Error(subheader string, errors ...error) {
+// Error logs an error message with the DefaultLogger's header.
+//
+// Parameters:
+//
+//	subheader - a short description of the error.
+//	errors - the error values to log.
+func (d DefaultLogger) Error(subheader string, errors ...error) {
 	d.logger.Error(d.header, subheader, &errors)
 }
 
-// Debug logs a debug message
-func (d *DefaultLogger) Debug(subheader string, details ...string) {
+// Debug logs a debug message with the DefaultLogger's header.
+//
+// Parameters:
+//
+//	subheader - a short description of the message.
+//	details - optional additional details.
+func (d DefaultLogger) Debug(subheader string, details ...string) {
 	d.logger.Debug(d.header, subheader, &details)
 }
 
-// Critical logs a critical message
-func (d *DefaultLogger) Critical(subheader string, details ...string) {
+// Critical logs a critical message with the DefaultLogger's header.
+//
+// Parameters:
+//
+//	subheader - a short description of the message.
+//	details - optional additional details.
+func (d DefaultLogger) Critical(subheader string, details ...string) {
 	d.logger.Critical(d.header, subheader, &details)
 }
 
-// Warning logs a warning message
-func (d *DefaultLogger) Warning(subheader string, details ...string) {
+// Warning logs a warning message with the DefaultLogger's header.
+//
+// Parameters:
+//
+//	subheader - a short description of the message.
+//	details - optional additional details.
+func (d DefaultLogger) Warning(subheader string, details ...string) {
 	d.logger.Warning(d.header, subheader, &details)
 }

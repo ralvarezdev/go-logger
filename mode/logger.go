@@ -16,12 +16,21 @@ type (
 
 	// DefaultLogger is the default mode logger
 	DefaultLogger struct {
-		logger gologger.Logger
+		logger   gologger.Logger
+		flagMode *goflagsmode.Flag
 	}
 )
 
 // NewDefaultLogger creates a new default mode logger
-func NewDefaultLogger(logger gologger.Logger) (
+//
+// Parameters:
+//
+//   - logger: the logger to use
+//   - flagMode: the mode flag to use
+func NewDefaultLogger(
+	logger gologger.Logger,
+	flagMode *goflagsmode.Flag,
+) (
 	*DefaultLogger,
 	error,
 ) {
@@ -30,11 +39,15 @@ func NewDefaultLogger(logger gologger.Logger) (
 		return nil, gologger.ErrNilLogger
 	}
 
-	return &DefaultLogger{logger}, nil
+	return &DefaultLogger{logger, flagMode}, nil
 }
 
 // Log logs a message
-func (d *DefaultLogger) Log(message *gologger.Message) {
+//
+// Parameters:
+//
+//   - message: the message to log
+func (d DefaultLogger) Log(message *gologger.Message) {
 	// Check if the message is nil
 	if message == nil {
 		return
@@ -48,12 +61,31 @@ func (d *DefaultLogger) Log(message *gologger.Message) {
 }
 
 // ShouldLog checks if the log should be logged
-func (d *DefaultLogger) ShouldLog(status gologgerstatus.Status) bool {
-	return LogModeMap[goflagsmode.ModeFlag.Mode()][status]
+//
+// Parameters:
+//
+//   - status: the status of the log
+//
+// Returns:
+//
+//   - bool: true if the log should be logged, false otherwise
+func (d DefaultLogger) ShouldLog(status gologgerstatus.Status) bool {
+	if d.flagMode == nil {
+		return true
+	}
+	if d.flagMode.IsDebug() {
+		return true
+	}
+	return status != gologgerstatus.Debug
 }
 
 // RunIfShouldLog runs the function if the log should be logged
-func (d *DefaultLogger) RunIfShouldLog(
+//
+// Parameters:
+//
+//   - status: the status of the log
+//   - fn: the function to run if the log should be logged
+func (d DefaultLogger) RunIfShouldLog(
 	status gologgerstatus.Status,
 	fn func(),
 ) {
@@ -63,7 +95,13 @@ func (d *DefaultLogger) RunIfShouldLog(
 }
 
 // Info logs an info message
-func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the info message
+//   - subheader: the subheader of the info message
+//   - details: the details of the info message
+func (d DefaultLogger) Info(header, subheader string, details *[]string) {
 	d.RunIfShouldLog(
 		gologgerstatus.Info, func() {
 			d.logger.Info(
@@ -76,7 +114,13 @@ func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
 }
 
 // Error logs an error message
-func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
+//
+// Parameters:
+//
+//   - header: the header of the error message
+//   - subheader: the subheader of the error message
+//   - errors: the errors of the error message
+func (d DefaultLogger) Error(header, subheader string, errors *[]error) {
 	d.RunIfShouldLog(
 		gologgerstatus.Error, func() {
 			d.logger.Error(
@@ -89,7 +133,7 @@ func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
 }
 
 // Debug logs a debug message
-func (d *DefaultLogger) Debug(header, subheader string, details *[]string) {
+func (d DefaultLogger) Debug(header, subheader string, details *[]string) {
 	d.RunIfShouldLog(
 		gologgerstatus.Debug, func() {
 			d.logger.Debug(
@@ -102,7 +146,13 @@ func (d *DefaultLogger) Debug(header, subheader string, details *[]string) {
 }
 
 // Critical logs a critical message
-func (d *DefaultLogger) Critical(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the critical message
+//   - subheader: the subheader of the critical message
+//   - details: the details of the critical message
+func (d DefaultLogger) Critical(header, subheader string, details *[]string) {
 	d.RunIfShouldLog(
 		gologgerstatus.Critical, func() {
 			d.logger.Critical(
@@ -115,7 +165,13 @@ func (d *DefaultLogger) Critical(header, subheader string, details *[]string) {
 }
 
 // Warning logs a warning message
-func (d *DefaultLogger) Warning(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the warning message
+//   - subheader: the subheader of the warning message
+//   - details: the details of the warning message
+func (d DefaultLogger) Warning(header, subheader string, details *[]string) {
 	d.RunIfShouldLog(
 		gologgerstatus.Warning, func() {
 			d.logger.Warning(

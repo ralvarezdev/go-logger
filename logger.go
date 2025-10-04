@@ -56,6 +56,17 @@ type (
 )
 
 // NewMessage creates a new message
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - description: the description of the message
+//   - status: the status of the message
+//
+// Returns:
+//
+//   - *Message: the new message
 func NewMessage(
 	header, subheader string,
 	description *[]string,
@@ -70,12 +81,20 @@ func NewMessage(
 }
 
 // Status returns the status of a message
-func (m *Message) Status() gologgerstatus.Status {
+//
+// Returns:
+//
+//   - gologgerstatus.Status: the status of the message
+func (m Message) Status() gologgerstatus.Status {
 	return m.status
 }
 
 // String gets the string representation of a message
-func (m *Message) String() string {
+//
+// Returns:
+//
+//   - string: the string representation of the message
+func (m Message) String() string {
 	var formattedMessage []string
 
 	// Add header
@@ -118,17 +137,32 @@ func (m *Message) String() string {
 }
 
 // NewDefaultLogger creates a new logger
+//
+// Returns:
+//
+//   - *DefaultLogger: the new logger
 func NewDefaultLogger() *DefaultLogger {
 	return &DefaultLogger{}
 }
 
 // Log logs a message
-func (d *DefaultLogger) Log(message *Message) {
+//
+// Parameters:
+//
+//   - message: the message to log
+func (d DefaultLogger) Log(message *Message) {
 	log.Println(message.String())
 }
 
 // BuildAndLog builds a message and logs it
-func (d *DefaultLogger) BuildAndLog(
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - details: the details of the message
+//   - status: the status of the message
+func (d DefaultLogger) BuildAndLog(
 	header, subheader string,
 	details *[]string,
 	status gologgerstatus.Status,
@@ -144,7 +178,13 @@ func (d *DefaultLogger) BuildAndLog(
 }
 
 // Info logs an info message
-func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - details: the details of the message
+func (d DefaultLogger) Info(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
@@ -154,7 +194,13 @@ func (d *DefaultLogger) Info(header, subheader string, details *[]string) {
 }
 
 // Error logs an error message
-func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - errors: the errors of the message
+func (d DefaultLogger) Error(header, subheader string, errors *[]error) {
 	// Map errors to a string array
 	mappedErrors := gostringsconvert.ErrorArrayToStringArray(errors)
 	d.BuildAndLog(
@@ -166,7 +212,13 @@ func (d *DefaultLogger) Error(header, subheader string, errors *[]error) {
 }
 
 // Debug logs a debug message
-func (d *DefaultLogger) Debug(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - details: the details of the message
+func (d DefaultLogger) Debug(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
@@ -176,7 +228,13 @@ func (d *DefaultLogger) Debug(header, subheader string, details *[]string) {
 }
 
 // Critical logs a critical message
-func (d *DefaultLogger) Critical(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - details: the details of the message
+func (d DefaultLogger) Critical(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,
@@ -186,7 +244,13 @@ func (d *DefaultLogger) Critical(header, subheader string, details *[]string) {
 }
 
 // Warning logs a warning message
-func (d *DefaultLogger) Warning(header, subheader string, details *[]string) {
+//
+// Parameters:
+//
+//   - header: the header of the message
+//   - subheader: the subheader of the message
+//   - details: the details of the message
+func (d DefaultLogger) Warning(header, subheader string, details *[]string) {
 	d.BuildAndLog(
 		header,
 		subheader,

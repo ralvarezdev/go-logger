@@ -19,6 +19,10 @@ const (
 )
 
 // String returns the string representation of the status
+//
+// Returns:
+//
+//   - string: the string representation of the status
 func (s Status) String() string {
 	switch s {
 	case Info:
@@ -37,6 +41,15 @@ func (s Status) String() string {
 }
 
 // Format gets the formatted status
+//
+// Parameters:
+//
+//   - contentSeparator *gostringsseparator.Content: the content separator
+//   - addCharactersFn gostringsadd.CharactersFn: the function to add characters
+//
+// Returns:
+//
+//   - string: the formatted status
 func (s Status) Format(
 	contentSeparator *gostringsseparator.Content,
 	addCharactersFn gostringsadd.CharactersFn,
