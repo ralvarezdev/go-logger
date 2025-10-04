@@ -13,3 +13,5 @@ github.com/ralvarezdev/go-strings v0.1.12 h1:AtOPDJ4lVO+33p7O4uECdD4C4D037h256zW
 github.com/ralvarezdev/go-strings v0.1.12/go.mod h1:8sFOqmPJpqzS7bTjf91EzUCITnwpmkfifwY80GxV5r8=
 github.com/ralvarezdev/go-strings v0.1.14 h1:NivBj8XzQ8mG/wS0mFKj2xlAIRpf+9QP56SJvPGJzGI=
 github.com/ralvarezdev/go-strings v0.1.14/go.mod h1:8sFOqmPJpqzS7bTjf91EzUCITnwpmkfifwY80GxV5r8=
+github.com/ralvarezdev/go-strings v0.1.15 h1:K+YnBiokOPNRvtVo7f2u0SyCjAILDVAqkRd2rgnBj4U=
+github.com/ralvarezdev/go-strings v0.1.15/go.mod h1:8sFOqmPJpqzS7bTjf91EzUCITnwpmkfifwY80GxV5r8=
