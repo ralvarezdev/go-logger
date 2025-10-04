@@ -7,13 +7,6 @@ import (
 )
 
 type (
-	// Logger interface for the mode logger
-	Logger interface {
-		ShouldLog(status gologgerstatus.Status) bool
-		RunIfShouldLog(status gologgerstatus.Status, fn func())
-		gologger.Logger
-	}
-
 	// DefaultLogger is the default mode logger
 	DefaultLogger struct {
 		logger   gologger.Logger

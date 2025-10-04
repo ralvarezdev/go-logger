@@ -5,31 +5,8 @@ import (
 	"strings"
 
 	gologgerstatus "github.com/ralvarezdev/go-logger/status"
-	gostringsadd "github.com/ralvarezdev/go-strings/add"
 	gostringsaddformat "github.com/ralvarezdev/go-strings/add/format"
 	gostringsconvert "github.com/ralvarezdev/go-strings/convert"
-	gostringsseparator "github.com/ralvarezdev/go-strings/separator"
-)
-
-var (
-	// HeaderSeparator is the header separator
-	HeaderSeparator = gostringsseparator.NewRepeatedContent(gostringsseparator.Space)
-
-	// StatusSeparator is the status separator
-	StatusSeparator = gostringsseparator.NewRepeatedContent(gostringsseparator.Space)
-
-	// DescriptionSeparator is the description separator
-	DescriptionSeparator = gostringsseparator.NewMultiline(
-		gostringsseparator.Space,
-		gostringsseparator.NewLine,
-		1,
-	)
-
-	// MessageSeparator is the message separator
-	MessageSeparator = gostringsseparator.Space
-
-	// AddCharactersFn is the add characters function
-	AddCharactersFn = gostringsadd.Brackets
 )
 
 type (
@@ -39,16 +16,6 @@ type (
 		subheader   string
 		description *[]string
 		status      gologgerstatus.Status
-	}
-
-	// Logger is an interface for logging messages
-	Logger interface {
-		Log(message *Message)
-		Info(header, subheader string, details *[]string)
-		Error(header, subheader string, errors *[]error)
-		Debug(header, subheader string, details *[]string)
-		Critical(header, subheader string, details *[]string)
-		Warning(header, subheader string, details *[]string)
 	}
 
 	// DefaultLogger is a logger that logs messages
